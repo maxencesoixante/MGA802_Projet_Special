@@ -1,0 +1,6 @@
+scikit-fem
+scipy
+pandas
+numpy
+matplotlib
+openpyxl
