@@ -28,7 +28,7 @@ def main():
     print("Simulation du champ 2D avec la puissance calibrée...")
     T_finale = jumeau.simuler(amplitude_q=puissance_optimale, temps_cible=temps_analyse)
 
-    # 5. Affichage des résultats
+    # 5. Affichage des résultats !
     afficher_champ_temperature(jumeau.mesh, T_finale, titre=f"Jumeau Numérique à t={temps_analyse}s")
 
 
