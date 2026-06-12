@@ -1,0 +1,79 @@
+# =============================================================================
+#  config.yaml — Configuration du Jumeau Numérique (MGA 802)
+# =============================================================================
+#  Toutes les valeurs modifiables du projet sont ici.
+#  Le code source (digital_twin.py, main.py) ne contient AUCUNE valeur en dur.
+#  Pour changer un paramètre, modifiez CE fichier — pas le code.
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# 1. MATÉRIAU — Propriétés thermophysiques du composite PEKK-FC / Carbone
+# -----------------------------------------------------------------------------
+materiau:
+  rho:  1310.0   # Densité volumique                   [kg/m³]
+  cp:    959.0   # Capacité thermique massique          [J/kg·K]
+  kx:    0.658   # Conductivité thermique transverse    [W/m·K]  (⊥ fibres)
+  ky:    6.800   # Conductivité thermique longitudinale [W/m·K]  (∥ fibres)
+  # Remarque : fibres alignées avec l'axe Y (longueur de la plaque)
+
+# -----------------------------------------------------------------------------
+# 2. GÉOMÉTRIE — Dimensions de la plaque soudée
+# -----------------------------------------------------------------------------
+geometrie:
+  x_min: -0.020   # Bord gauche  [m]   → largeur totale = 40 mm
+  x_max:  0.020   # Bord droit   [m]
+  y_min: -0.060   # Bord bas     [m]   → longueur totale = 120 mm
+  y_max:  0.060   # Bord haut    [m]
+
+# -----------------------------------------------------------------------------
+# 3. MAILLAGE — Résolution de la discrétisation spatiale
+# -----------------------------------------------------------------------------
+maillage:
+  nx: 20   # Nombre de nœuds selon X (largeur)
+  ny: 60   # Nombre de nœuds selon Y (longueur)
+  # Taille de maille : Δx ≈ 2.1 mm,  Δy ≈ 2.0 mm
+  # Augmenter nx/ny améliore la précision mais allonge le temps de calcul.
+
+# -----------------------------------------------------------------------------
+# 4. THERMOCOUPLES — Positions des capteurs (coordonnées en mètres)
+# -----------------------------------------------------------------------------
+thermocouples:
+  TC2: [ 0.000,  0.000]   # Centre de la plaque (point chaud)
+  TC3: [ 0.000,  0.060]   # Bord haut, axe central
+  TC4: [ 0.020, -0.060]   # Coin bas droit
+  TC5: [-0.020, -0.060]   # Coin bas gauche
+
+# -----------------------------------------------------------------------------
+# 5. SOURCE D'INDUCTION — Modèle gaussien de la bobine
+# -----------------------------------------------------------------------------
+source_induction:
+  rayon_bobine: 0.015   # Rayon caractéristique σ de la gaussienne [m]
+  # Q(x,y) = amplitude · exp(-(x²+y²) / (2·σ²))
+  # L'amplitude est déterminée par la calibration — ne pas la fixer ici.
+
+# -----------------------------------------------------------------------------
+# 6. SIMULATION — Paramètres numériques de l'intégration temporelle
+# -----------------------------------------------------------------------------
+simulation:
+  dt:        1.0    # Pas de temps [s]   (Euler implicite → inconditionnellement stable)
+  T_initiale: 22.0  # Température initiale uniforme de la plaque [°C]
+  T_ambiante: 22.0  # Température ambiante (référence pour les pertes) [°C]
+
+# -----------------------------------------------------------------------------
+# 7. CALIBRATION — Paramètres de l'algorithme d'optimisation
+# -----------------------------------------------------------------------------
+calibration:
+  methode:       'L-BFGS-B'   # Optimiseur scipy (quasi-Newton avec gradient numérique)
+  log_Q_init:    6.0           # Point de départ : log₁₀(Q_ind) → Q₀ = 10⁶ W/m³
+  log_h_init:    3.5           # Point de départ : log₁₀(h_eff) → h₀ ≈ 3162 W/m³·K
+  max_iterations: 200          # Nombre maximum d'itérations autorisées
+  tolerance_f:   1.0e-9        # Tolérance sur la variation relative de la MSE
+  tolerance_g:   1.0e-6        # Tolérance sur la norme du gradient
+
+# -----------------------------------------------------------------------------
+# 8. FICHIERS — Chemins d'entrée / sortie
+# -----------------------------------------------------------------------------
+fichiers:
+  donnees_excel:      "data/5TC_226A.xlsx"
+  sortie_comparaison: "comparaison_tc.png"
+  sortie_champ_2d:    "champ_2D.png"
